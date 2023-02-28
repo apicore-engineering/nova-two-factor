@@ -34,8 +34,8 @@ class TwoFactorController extends Controller
 
         $data['recovery'] = $recoveryKey;
 
-
-        $userTwoFa = new TwoFa();
+        $model = config('nova-two-factor.2fa_model');
+        $userTwoFa = new $model;
         $userTwoFa::where('user_id', auth()->user()->id)->delete();
         $user2fa = new $userTwoFa();
         $user2fa->user_id = auth()->user()->id;
