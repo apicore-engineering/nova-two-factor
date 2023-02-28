@@ -27,8 +27,7 @@ class TwoFactorController extends Controller
         }
 
         $google2fa = new G2fa();
-        $google2fa->setAlgorithm(Constants::SHA512);
-        $secretKey = $google2fa->generateSecretKey();
+        $secretKey = $google2fa->generateSecretKey(32);
 
         $recoveryKey = strtoupper(Str::random(16));
         $recoveryKey = str_split($recoveryKey,4);
@@ -39,7 +38,7 @@ class TwoFactorController extends Controller
         $data['recovery'] = $recoveryKey;
 
         $model = config('nova-two-factor.2fa_model');
-        $userTwoFa = new $model;
+        $userTwoFa = new $model();
         $userTwoFa::where('user_id', auth()->user()->id)->delete();
         $user2fa = new $userTwoFa();
         $user2fa->user_id = auth()->user()->id;
