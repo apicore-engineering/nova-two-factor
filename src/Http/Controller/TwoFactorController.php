@@ -4,13 +4,15 @@ namespace Visanduma\NovaTwoFactor\Http\Controller;
 
 
 use App\Http\Controllers\Controller;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use PragmaRX\Google2FA\Google2FA;
 use PragmaRX\Google2FA\Google2FA as G2fa;
 use PragmaRX\Google2FA\Support\Constants;
-use Visanduma\NovaTwoFactor\Models\TwoFa;
 use Visanduma\NovaTwoFactor\TwoFaAuthenticator;
 
 class TwoFactorController extends Controller
@@ -113,17 +115,12 @@ class TwoFactorController extends Controller
         $g2fa = new G2fa();
         $url = $g2fa->getQRCodeUrl($company, $holder, $secret);
 
-        return self::generateGoogleQRCodeUrl('https://chart.googleapis.com/', 'chart', 'chs='.$size.'x'.$size.'&chld=M|0&cht=qr&chl=', $url);
-    }
-
-    public static function generateGoogleQRCodeUrl($domain, $page, $queryParameters, $qrCodeUrl)
-    {
-        $url = $domain.
-            rawurlencode($page).
-            '?'.$queryParameters.
-            urlencode($qrCodeUrl);
-
-        return $url;
+        $renderer = new ImageRenderer(
+            new RendererStyle($size),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        return 'data:image/svg+xml;base64,' . base64_encode($writer->writeString($url));
     }
 
     // Form uses
