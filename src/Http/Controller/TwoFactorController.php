@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use PragmaRX\Google2FA\Google2FA as G2fa;
+use PragmaRX\Google2FA\Support\Constants;
 use Visanduma\NovaTwoFactor\Models\TwoFa;
 use Visanduma\NovaTwoFactor\TwoFaAuthenticator;
 
@@ -24,6 +25,7 @@ class TwoFactorController extends Controller
         }
 
         $google2fa = new G2fa();
+        $google2fa->setAlgorithm(Constants::SHA512);
         $secretKey = $google2fa->generateSecretKey();
 
         $recoveryKey = strtoupper(Str::random(16));
